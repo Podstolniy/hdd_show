@@ -1,0 +1,95 @@
+# -*- coding: utf-8 -*-
+#my_unicode_string = u"Это юникод!"
+#!/usr/bin/python
+
+import os
+import platform
+import csv
+import subprocess
+import sys
+import argparse
+
+import abc
+
+#from typing import List, Union
+#from collections import namedtuple
+
+
+#class HddParser(abc.ABC): #класс abc
+	
+	#@abc.abstractmethod
+#	def defhdd(self): #функция по дефолтному значению
+#		pass
+#		"""
+#		ТЕСТ1
+#		"""
+	#@abc.abstractmethod
+#	def part(self): #функция по дефолтному значению
+#		pass
+#		"""
+#		ТЕСТ1
+#		"""
+
+class LinuxDisk():#
+	pass
+	#def defhdd(self): #функция по дефолтному значению
+	#	os.system('lsblk --nodeps --bytes --json --output=MODEL,NAME,SIZE | grep "sda"')
+    #
+    #    def part(self,args):
+    #            if len(args.d)==1:
+    #                    print('1')
+    #                    if args.info:
+	#						print('-info')
+    #            if len(args.d)==2:
+	#		print('1,2')
+	#		if args.info:
+	#			print('1 2 -info')
+
+class WindowsDisk():#
+
+	def def_hdd(self): #функция по дефолтному значению
+		#os.system('wmic diskdrive get Index,Size,Caption | find "Disk Device"')
+		os.system('wmic diskdrive get Index,Size,Caption')
+		
+	#-------------------	
+	def part(self,args):
+		if len(args.d)==1:
+			os.system('wmic partition where DiskIndex={} get Index,Name,Size /FORMAT:CSV').format(args.d[0])
+			if args.info:
+				os.system('wmic diskdrive where Index={} get description, DeviceID, Manufacturer, Index, Size, model, SerialNumber /FORMAT:CSV'.format(args.d[0]))
+		if len(args.d)==2:
+			os.system('wmic partition get Name,Size | find "Disk #{}" | find "Partition #{}"'.format(args.d[0],args.d[1]))
+			if args.info:
+				os.system('WMIC PARTITION list brief /format:csv | find "Disk #{}" | find "Partition #{}"'.format(args.d[0],args.d[1]))
+#-------------------	
+class ParserStr():
+	def stdio_parser (self):
+		parser = argparse.ArgumentParser()
+		parser.add_argument ('d',action='store', nargs='*',type=int, help = 'Namber Disk', metavar = 'Name')
+		parser.add_argument ('-info', action='store_true', default=False)
+		return parser
+
+def main():
+	#--проверка платформы
+	if platform.system() == 'Windows':
+		c_lsdefault = WindowsDisk()
+		print('OS Windows')
+			
+	if platform.system() == 'Linux':
+		c_lsdefault = LinuxDisk()
+		print('OS Linux')
+	#--------------------
+
+	parser = ParserStr()
+	clskey=parser.stdio_parser()
+	args = clskey.parse_args()
+	
+	if args.d == []:
+		c_lsdefault.def_hdd()
+		print(args.d)
+	else:
+		c_lsdefault.part(args)
+		print(args.d)
+		
+if __name__ == '__main__':
+	main()
