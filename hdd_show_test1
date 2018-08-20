@@ -54,7 +54,7 @@ class WindowsDisk():#
 	#-------------------	
 	def part(self,args):
 		if len(args.d)==1:
-			os.system('wmic partition where DiskIndex={} get Index,Name,Size /FORMAT:CSV').format(args.d[0])
+			os.system('wmic partition where DiskIndex={} get Index,Name,Size /FORMAT:CSV'.format(args.d[0]))
 			if args.info:
 				os.system('wmic diskdrive where Index={} get description, DeviceID, Manufacturer, Index, Size, model, SerialNumber /FORMAT:CSV'.format(args.d[0]))
 		if len(args.d)==2:
